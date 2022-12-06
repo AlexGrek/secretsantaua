@@ -4,7 +4,7 @@ import { Notification, Steps, Toggle, List, Stack } from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
-const URL = 'ws://localhost:3030'
+const URL = 'ws://localhost:3330'
 class App extends Component {
   constructor(props) {
     super(props);
