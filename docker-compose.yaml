@@ -6,3 +6,8 @@ services:
       .
     ports:
       - "8080:80"
+  wserver:
+    build:
+      "server"
+    ports:
+      - "3330:3030"
