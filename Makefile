@@ -13,3 +13,5 @@ deploy:
 	sudo docker-compose up
 
 all: build-server build-client build-deploy
+
+.PHONY: all deploy build-deploy build-server build-client
