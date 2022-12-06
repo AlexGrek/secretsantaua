@@ -1,7 +1,7 @@
 const WebSocket = require('ws');
 let random = new (require('random-utils-and-tools').Random)()
 
-const wss = new WebSocket.Server({ port: 3030 });
+const wss = new WebSocket.Server({ port: 3330 });
 
 console.log("Server launched")
 
