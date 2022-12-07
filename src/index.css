@@ -83,32 +83,42 @@ body {
 }
 
 .App {
-	height: 80%;
-	width: 70%;
+	min-height: 80%;
+	min-width: 70%;
 	background-color: rgba(225, 186, 225, 0.914);
 	box-shadow: 0px 0px 25px 0px rgba(0,0,0,0.6);
 	border-radius: 20pt;
-	padding: 40pt;
+	padding: 10pt;
 	backdrop-filter: blur(10px);
 }
 
 .reveal-chat-button {
 	position: absolute;
 	right: 20px;
-	border:1px solid #222;
-	top: 19px;
+	bottom: -2px;
+	/* border:1px solid #222; */
+	/* top: 19px; */
+	opacity: .9;
 	padding: 5px 20px;
 }
 
+.reveal-chat-button button {
+	background: rgba(255, 255, 255, 0.298);
+	border-radius: 4px;
+}
+
 .app-window-content {
-	height: 90%;
+	min-height: 90%;
+	overflow-x: scroll;
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	padding-top: 10pt;
 }
 
 .app-window-content button {
+
 	box-shadow:inset 0px 1px 0px 0px #bbdaf7;
 	background:linear-gradient(to bottom, #79bbff 5%, #378de5 100%);
 	background-color:#79bbff;
@@ -124,7 +134,9 @@ body {
 	text-decoration:none;
 	text-shadow:0px 1px 0px #528ecc;
 	display: block;
-	margin: 8pt;
+	margin: auto;
+	margin-top: 4pt;
+	margin-bottom: 12pt;
 }
 
 .app-window-content button:hover {
@@ -147,16 +159,28 @@ body {
 
 .big-field {
 	min-height: 30em;
+	max-width: 90%;
 }
 
 .wishes-text {
 	border: none;
 	border-radius: 4pt;
-	min-width: 35em;
+	width: 90%;
 	min-height: 20%;
 	margin: 2pt;
 }
 
 .ready-toggle {
 	margin-left: 4pt;
+}
+
+.slow-appearing {
+	opacity: 0;
+	animation: fadeIn 5s forwards;
+	animation-delay: 2s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+      to { opacity: 1; }
 }

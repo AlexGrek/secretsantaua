@@ -33,6 +33,8 @@ function randomName() {
 
 var realNamesMapping = {}
 var wishesMapping = {}
+var giftMapping = {}
+var usersClientsPool = {}
 var state = {
   registered: [],
   ready: [],
@@ -75,6 +77,29 @@ function distribute(usersAll) {
   return pairs;
 }
 
+function populateGiftPairs(pairs) {
+  pairs.forEach((el) => {
+    giftMapping[el.f] = el.t;
+  })
+}
+
+function sendRevealData(client) {
+  console.warn(`sending reveal data: ${giftMapping}`);
+  for (const [key, value] of Object.entries(usersClientsPool)) {
+    console.log(`Checking ${key}`);
+    var client = value;
+    if (client.readyState === WebSocket.OPEN && giftMapping[key]) {
+      console.log(`Sending reveal data to ${key}`);
+      var name = giftMapping[key];
+      var realName = state.options.reveal_names ? realNamesMapping[name] : "anonymous_" + random.randomAsciiLetters(4);
+      var reveal = { id: name, wishes: wishesMapping[name], realName: realName };
+      console.log(reveal);
+      var value_to_send = JSON.stringify({ personal: { reveal: reveal } })
+      client.send(value_to_send);
+    }
+  }
+}
+
 function updateState(input, client, name) {
   console.log("Received command: " + input.command);
   if (input.command == "register") {
@@ -92,13 +117,13 @@ function updateState(input, client, name) {
   }
   if (input.command == "ready") {
     var wishes = input.wishes;
-    // user = clientUserMapping[client];
     user = name;
     state.ready.push(user);
     console.log(`I want to assing user <${user}> to have wishes: <${wishes}>`)
     wishesMapping[user] = wishes;
     if (state.registered.every(el => state.ready.includes(el)) && state.registered.length > 2) {
       state.pairs = distribute(state.registered);
+      populateGiftPairs(state.pairs);
     }
   }
 }
@@ -114,6 +139,8 @@ function sendChat(wss, ws, data) {
 function reset() {
   realNamesMapping = {}
   wishesMapping = {}
+  giftMapping = {}
+  usersPool = {}
   state = {
     registered: [],
     ready: [],
@@ -148,7 +175,7 @@ function removeItem(list, item) {
 
 wss.on('connection', function connection(ws) {
   var name = randomName();
-  // clientUserMapping[ws] = name;
+  usersClientsPool[name] = ws;
   ws.on('message', function incoming(data) {
     console.log(data);
     var parsed = JSON.parse(data);
@@ -156,6 +183,9 @@ wss.on('connection', function connection(ws) {
       console.log("Updating state");
       updateState(parsed, ws, name);
       sendUpdates(wss, state);
+      if (state.pairs.length > 0) {
+        sendRevealData(wss);
+      }
     }
     else {
       sendChat(wss, ws, data);
@@ -169,8 +199,8 @@ wss.on('connection', function connection(ws) {
       removeItem(state.registered, removedUser);
       console.log("removed from registered: " + removedUser)
     }
+    delete usersClientsPool[removedUser];
     console.log(state);
-    // delete clientUserMapping[ws]
     if (state.registered.length < 1) {
       // everyone left
       reset();

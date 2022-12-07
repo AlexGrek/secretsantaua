@@ -1,10 +1,11 @@
 import React, { Component } from 'react'
 import Chat from './Chat'
 import { Notification, Steps, Toggle, List, Stack } from 'rsuite';
+import Reveal from './Reveal';
 import 'rsuite/dist/rsuite.min.css';
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
 
-const URL = 'ws://localhost:3330'
+const URL = 'ws://localhost:3030'
 class App extends Component {
   constructor(props) {
     super(props);
@@ -15,6 +16,7 @@ class App extends Component {
         pairs: [],
         options: []
       },
+      reveal: null,
       registered: false,
       realName: "",
       assignedName: null,
@@ -36,6 +38,9 @@ class App extends Component {
       }
       if (upd.personal.assignedName !== undefined) {
         this.setState({ assignedName: upd.personal.assignedName })
+      }
+      if (upd.personal.reveal !== undefined) {
+        this.setState({reveal: upd.personal.reveal});
       }
     } else {
       this.setState({ current: upd });
@@ -82,13 +87,14 @@ class App extends Component {
         <p>{f}<ArrowRightIcon></ArrowRightIcon>{t}</p>
       </List.Item>
     })
-    return <Stack>
+    return <Stack wrap spacing={6}>
       <div className='widget-inside'>
       <List bordered>
         {pairs}
       </List>
     </div>
-      </Stack>
+    <Reveal secret={this.state.reveal}></Reveal>
+    </Stack>
   }
 
   onReadyStep1Clicked = () => {

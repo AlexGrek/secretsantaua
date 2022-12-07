@@ -53,7 +53,7 @@ class Chat extends Component {
     return (
       <div>
         <div className='reveal-chat-button' style={{ visibility: this.state.isOpen ? 'hidden' : 'visible' }}>
-            <button onClick={() => this.changeChatVisibility(true)}>Open chat</button>
+            <button onClick={() => this.changeChatVisibility(true)}>Жахливий чат</button>
           </div>
         <div class="fixed-chat" style={{ visibility: this.state.isOpen ? 'visible' : 'hidden' }}>
           <div class="panel-chat">
