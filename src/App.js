@@ -22,7 +22,7 @@ class App extends Component {
       assignedName: null,
       step: 0,
       step1ready: false,
-      wishes: "На твій россуд, що завгодно."
+      wishes: "На твій розсуд, що завгодно."
     }
   }
 
