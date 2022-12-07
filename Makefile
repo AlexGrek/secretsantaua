@@ -1,6 +1,5 @@
 build-server:
-	cd server
-	npm i
+	cd server && npm i
 
 build-client:
 	npm i
@@ -14,4 +13,8 @@ deploy:
 
 all: build-server build-client build-deploy
 
-.PHONY: all deploy build-deploy build-server build-client
+update:
+	git pull
+	make all
+
+.PHONY: all deploy build-deploy build-server build-client update
