@@ -17,7 +17,7 @@ body {
 	position: fixed;
 	bottom: 0;
 	box-shadow: 1px 5px 10px #aaa;
-	right: 40px;
+	right: 0px;
 	border-radius: 5px 5px 0px 0px;
 	width: 350px;
 	height: 450px;
@@ -96,8 +96,6 @@ body {
 	position: absolute;
 	right: 20px;
 	bottom: -2px;
-	/* border:1px solid #222; */
-	/* top: 19px; */
 	opacity: .9;
 	padding: 5px 20px;
 }
@@ -183,4 +181,21 @@ body {
 @keyframes fadeIn {
     from { opacity: 0; }
       to { opacity: 1; }
+}
+
+.render0-inside {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.header-render0 {
+	margin-bottom: 15pt;
+	text-align: right;
+}
+
+.instruction-text {
+	font-size: small;
+	max-width: 370pt;
+	text-align: justify;
 }

@@ -70,11 +70,23 @@ class App extends Component {
   }
 
   renderStep0 = () => {
-    return <div><div className='widget-inside'>
+    return <div className='render0-inside'>
+      <header className='header-render0'>
+      <h2>Таємний Санта українською</h2>
+      <small>реалтаймовий. трохи прибацаний. <b>але свій.</b></small>
+      </header>
+      <div>
+      <div className='widget-inside'>
       <p>Як тебе звати насправді, котику?</p>
       <input value={this.state.realName || ""} onChange={this.onRealNameChange}></input>
     </div>
       <button onClick={this.onRegisterClick} disabled={this.state.registered}>Зарееструй мене</button>
+    </div>
+    <p className='instruction-text'>
+      <b>Отже, інструкція.</b> Зібрати друзів, відкрити цю сторінку <i>одночасно</i>. 
+      Далі ввести свої реальні імена, побажання чого б ви хотіли отримати, і коли всі це зроблять і
+      відмітять готовніть, відбудеться <b>магія</b>. Мінімум 3 людини.
+    </p>
     </div>
   }
 
