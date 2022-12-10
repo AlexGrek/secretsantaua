@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import Chat from './Chat'
-import { Notification, Steps, Toggle, List, Stack } from 'rsuite';
+import { Notification, Steps, Toggle, List, Stack, Checkbox, SelectPicker } from 'rsuite';
 import Reveal from './Reveal';
 import 'rsuite/dist/rsuite.min.css';
 import ArrowRightIcon from '@rsuite/icons/ArrowRight';
@@ -14,7 +14,8 @@ class App extends Component {
         registered: [],
         ready: [],
         pairs: [],
-        options: []
+        options: [],
+        available_shuffle_algs: []
       },
       reveal: null,
       registered: false,
@@ -40,7 +41,7 @@ class App extends Component {
         this.setState({ assignedName: upd.personal.assignedName })
       }
       if (upd.personal.reveal !== undefined) {
-        this.setState({reveal: upd.personal.reveal});
+        this.setState({ reveal: upd.personal.reveal });
       }
     } else {
       this.setState({ current: upd });
@@ -56,7 +57,9 @@ class App extends Component {
   }
 
   onOptionChange = (name, value) => {
-    this.ws.send(JSON.stringify({command: "changeopt", option: name, value: value}));
+    console.log("change option: " + name)
+    console.log("value: " + value)
+    this.ws.send(JSON.stringify({ command: "changeopt", option: name, value: value }));
   }
 
   onRealNameChange = event => {
@@ -72,21 +75,21 @@ class App extends Component {
   renderStep0 = () => {
     return <div className='render0-inside'>
       <header className='header-render0'>
-      <h2>Таємний Санта українською</h2>
-      <small>реалтаймовий. трохи прибацаний. <b>але свій.</b></small>
+        <h2>Таємний Санта українською</h2>
+        <small>реалтаймовий. трохи прибацаний. <b>але свій.</b></small>
       </header>
       <div>
-      <div className='widget-inside'>
-      <p>Як тебе звати насправді, котику?</p>
-      <input value={this.state.realName || ""} onChange={this.onRealNameChange}></input>
-    </div>
-      <button onClick={this.onRegisterClick} disabled={this.state.registered}>Зарееструй мене</button>
-    </div>
-    <p className='instruction-text'>
-      <b>Отже, інструкція.</b> Зібрати друзів, відкрити цю сторінку <i>одночасно</i>. 
-      Далі ввести свої реальні імена, побажання чого б ви хотіли отримати, і коли всі це зроблять і
-      відмітять готовніть, відбудеться <b>магія</b>. Мінімум 3 людини.
-    </p>
+        <div className='widget-inside'>
+          <p>Як тебе звати насправді, котику?</p>
+          <input value={this.state.realName || ""} onChange={this.onRealNameChange}></input>
+        </div>
+        <button onClick={this.onRegisterClick} disabled={this.state.registered}>Зарееструй мене</button>
+      </div>
+      <p className='instruction-text'>
+        <b>Отже, інструкція.</b> Зібрати друзів, відкрити цю сторінку <i>одночасно</i>.
+        Далі ввести свої реальні імена, побажання чого б ви хотіли отримати, і коли всі це зроблять і
+        відмітять готовніть, відбудеться <b>магія</b>. Мінімум 3 людини.
+      </p>
     </div>
   }
 
@@ -101,11 +104,11 @@ class App extends Component {
     })
     return <Stack wrap spacing={6}>
       <div className='widget-inside'>
-      <List bordered>
-        {pairs}
-      </List>
-    </div>
-    <Reveal secret={this.state.reveal}></Reveal>
+        <List bordered>
+          {pairs}
+        </List>
+      </div>
+      <Reveal secret={this.state.reveal}></Reveal>
     </Stack>
   }
 
@@ -122,6 +125,11 @@ class App extends Component {
     return registeredRenders
   }
 
+  renderAlgSelector = () => {
+    var data = this.state.current.available_shuffle_algs.map(el => ({label: el, value: el}))
+    return <SelectPicker data={data} style={{ width: 224 }} value={this.state.current.options["shuffle_alg"]} onChange={val => this.onOptionChange("shuffle_alg", val)} />
+  }
+
   renderStep1 = () => {
     return <div className="big-field">
       <h1>Вітаю!</h1>
@@ -135,6 +143,14 @@ class App extends Component {
         </Toggle></p>
       <div>
         <p>Інші котики: {this.renderAllReadyStates()}</p>
+        <Checkbox checked={this.state.current.options["reveal_names"] || false} onChange={val => this.onOptionChange("reveal_names", !this.state.current.options["reveal_names"])}>
+          Розкрити реальні імена (кому дарувати)
+        </Checkbox>
+        <Stack>
+          <p>Алгоритм: </p>
+          {this.renderAlgSelector()}
+        </Stack>
+
       </div>
     </div>
   }

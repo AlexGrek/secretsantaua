@@ -31,26 +31,31 @@ function randomName() {
   return `${first} ${second}`
 }
 
+function init_state() {
+  return {
+    registered: [],
+    ready: [],
+    pairs: [],
+    options: {
+      "shuffle_alg": "random",
+      "reveal_names": true
+    },
+    available_shuffle_algs: ["random", "pairs", "chain"]
+  }
+}
+
 var realNamesMapping = {}
 var wishesMapping = {}
 var giftMapping = {}
 var usersClientsPool = {}
-var state = {
-  registered: [],
-  ready: [],
-  pairs: [],
-  options: {
-    "shuffle_alg": "random",
-    "reveal_names": true
-  }
-}
+var state = init_state()
 
 function p(f, t) {
   console.log(`PAIR: ${f}  --->  ${t}`)
   return { f: f, t: t }
 }
 
-function distribute(usersAll) {
+function distribute_random(usersAll) {
   console.log("Shuffling everything...");
   var users = [...usersAll]
   random.shuffle(users);
@@ -77,6 +82,33 @@ function distribute(usersAll) {
   return pairs;
 }
 
+function distribute_chain(data) {
+  var users = [...data]
+  random.shuffle(users);
+  var pairs = []
+  for (var i = 0; i < users.length - 1; i++) {
+    pairs.push(p(users[i], users[i+1]))
+  }
+  // and the last one gives to first
+  pairs.push(p(users[users.length - 1], users[0]));
+  return pairs;
+}
+
+function distribute_pairs(data) {
+  var users = [...data]
+  random.shuffle(users);
+  var pairs = []
+  for (var i = 0; i < users.length - 1; i=i+2) {
+    pairs.push(p(users[i], users[i+1]))
+    pairs.push(p(users[i+1], users[i]))
+  }
+  if (users.length % 2 != 0) {
+    console.warn("WARNING: pairs should be used on even length sequences, or the last one will be the looser");
+    pairs.push(p(users[users.length - 1], users[users.length - 1]));
+  }
+  return pairs;
+}
+
 function populateGiftPairs(pairs) {
   pairs.forEach((el) => {
     giftMapping[el.f] = el.t;
@@ -91,12 +123,26 @@ function sendRevealData(client) {
     if (client.readyState === WebSocket.OPEN && giftMapping[key]) {
       console.log(`Sending reveal data to ${key}`);
       var name = giftMapping[key];
-      var realName = state.options.reveal_names ? realNamesMapping[name] : "anonymous_" + random.randomAsciiLetters(4);
+      var realName = state.options.reveal_names ? realNamesMapping[name] : "Анонімус";
       var reveal = { id: name, wishes: wishesMapping[name], realName: realName };
       console.log(reveal);
       var value_to_send = JSON.stringify({ personal: { reveal: reveal } })
       client.send(value_to_send);
     }
+  }
+}
+
+function distribute_by_alg(alg, data) {
+  console.log("Randomizing using alg: " + alg)
+  switch (alg) {
+    case "random":
+      return distribute_random(data)
+    case "chain":
+      return distribute_chain(data)
+    case "pairs":
+      return distribute_pairs(data)
+    default:
+      return distribute_random(data)
   }
 }
 
@@ -122,7 +168,7 @@ function updateState(input, client, name) {
     console.log(`I want to assing user <${user}> to have wishes: <${wishes}>`)
     wishesMapping[user] = wishes;
     if (state.registered.every(el => state.ready.includes(el)) && state.registered.length > 2) {
-      state.pairs = distribute(state.registered);
+      state.pairs = distribute_by_alg(state.options.shuffle_alg, state.registered);
       populateGiftPairs(state.pairs);
     }
   }
@@ -141,15 +187,7 @@ function reset() {
   wishesMapping = {}
   giftMapping = {}
   usersPool = {}
-  state = {
-    registered: [],
-    ready: [],
-    pairs: [],
-    options: {
-      "shuffle_alg": "random",
-      "reveal_names": true
-    }
-  }
+  state = init_state()
 }
 
 function sendUpdates(wss, state) {
